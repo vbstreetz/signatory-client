@@ -26,10 +26,10 @@ workbox.clientsClaim();
  */
 self.__precacheManifest = [
   {
-    "url": "webpack-runtime-5444200609aaa3f8e55c.js"
+    "url": "webpack-runtime-ee1da0ec1ce944e59b86.js"
   },
   {
-    "url": "styles.c997a9a371957158bba8.css"
+    "url": "styles.6fc5faf7a9ad7d9edf86.css"
   },
   {
     "url": "styles-d5f877f620552d9e1a80.js"
@@ -38,18 +38,26 @@ self.__precacheManifest = [
     "url": "commons-e6c8d5c814fb37f6a791.js"
   },
   {
-    "url": "app-288c3875cd55f8b3a5ef.js"
+    "url": "app-0e599e504d77a2c78af6.js"
   },
   {
     "url": "component---node-modules-gatsby-plugin-offline-app-shell-js-ebda79b2f242b4f85f83.js"
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "bb494b2736fe4d8bf00943bd67849086"
+    "revision": "0f7ff1c57c8bdde4698a7225b853128c"
+  },
+  {
+    "url": "page-data/offline-plugin-app-shell-fallback/page-data.json",
+    "revision": "c355c8040c47a63bfb3360e4b7cb6553"
+  },
+  {
+    "url": "page-data/app-data.json",
+    "revision": "929ba6a8b6a56c07457b93d470c1248d"
   },
   {
     "url": "manifest.webmanifest",
-    "revision": "91d0c7856bc24d18b595a9863e4ff350"
+    "revision": "b23c5bd81b469c74a30951ea3d4aa797"
   }
 ].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
@@ -68,12 +76,12 @@ const { NavigationRoute } = workbox.routing
 
 const navigationRoute = new NavigationRoute(async ({ event }) => {
   let { pathname } = new URL(event.request.url)
-  pathname = pathname.replace(new RegExp(`^`), ``)
+  pathname = pathname.replace(new RegExp(`^/signatory-client`), ``)
 
   // Check for resources + the app bundle
   // The latter may not exist if the SW is updating to a new version
   const resources = await idbKeyval.get(`resources:${pathname}`)
-  if (!resources || !(await caches.match(`/app-288c3875cd55f8b3a5ef.js`))) {
+  if (!resources || !(await caches.match(`/signatory-client/app-0e599e504d77a2c78af6.js`))) {
     return await fetch(event.request)
   }
 
@@ -86,7 +94,7 @@ const navigationRoute = new NavigationRoute(async ({ event }) => {
     }
   }
 
-  const offlineShell = `/offline-plugin-app-shell-fallback/index.html`
+  const offlineShell = `/signatory-client/offline-plugin-app-shell-fallback/index.html`
   return await caches.match(offlineShell)
 })
 
