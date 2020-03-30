@@ -6,21 +6,26 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [master, buildx]
   pull_request:
-    branches: [ master ]
+    branches: [master, buildx]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        name: Build image job
-        steps:
-            - name: Checkout master
-              uses: actions/checkout@master
-            - name: Build and publish image
-              uses: ilteoood/docker_buildx@master
-              with:
-                publish: true
-                imageName: vbstreetz/signatory-client
-                dockerHubUser: vbstreetz
-                dockerHubPassword: ${{ secrets.dockerhub }}
+  buildx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: latest
+      - name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+      - name: Run Buildx
+        run: |
+          docker buildx build \
+            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x \
+            --output "type=image,push=false" \
+            --file ./DockerfileRelease ./
