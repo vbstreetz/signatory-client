@@ -2,6 +2,5 @@ FROM node:10.18.0 AS builder
 RUN npm install serve @etclabscore/signatory
 
 FROM node:10.18.0-alpine AS app
-RUN apt-get install libc6-armhf-cross -y
-COPY --from=builder node_modules node_modules
+COPY --from=builder . .
 ADD build build
