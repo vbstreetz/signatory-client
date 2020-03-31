@@ -1,6 +1,6 @@
 FROM node:10.18.0 AS builder
 RUN npm install serve @etclabscore/signatory
 
-FROM node:10.18.0-alpine AS app
-COPY --from=builder . .
+FROM node:10.18.0 AS app
+COPY --from=builder node_modules node_modules
 ADD build build
