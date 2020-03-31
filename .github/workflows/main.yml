@@ -27,7 +27,6 @@ jobs:
         with:
           node-version: '10.18.0'
       - run: yarn install
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
       - run: yarn build
       # docker
       - uses: actions/cache@v1
