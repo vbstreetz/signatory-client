@@ -28,7 +28,7 @@ export const CHAINS = {
     networks: {
       1: { name: 'mainnet', providerUrl: 'https://www.ethercluster.com/etc' },
       6: { name: 'kotti', providerUrl: 'https://www.ethercluster.com/kotti' },
-      // 63: { name: 'kotti', providerUrl: 'https://www.ethercluster.com/mordor' },
+      63: { name: 'kotti', providerUrl: 'https://www.ethercluster.com/mordor' },
     },
   },
 };
