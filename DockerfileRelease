@@ -1,3 +1,5 @@
-FROM node:10.18.0
-RUN npm install serve @etclabscore/signatory
+FROM node:10.18.0-alpine
+RUN apk add --no-cache --virtual .gyp python make g++ \
+  && npm install --prefer-offline serve @etclabscore/signatory \
+  && apk del .gyp
 ADD build build
