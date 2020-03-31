@@ -5,6 +5,7 @@ build:
 	@docker-compose -f docker-compose-build.yml -p sc-build build
 
 run:
+	@docker-compose -f docker-compose-release.yml -p sc-release pull
 	@docker-compose -f docker-compose-release.yml -p sc-release up
 
 push:
