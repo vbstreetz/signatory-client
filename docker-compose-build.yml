@@ -9,12 +9,12 @@ services:
         REACT_APP_INFURA_API_KEY: '${INFURA_API_KEY}'
     platform: linux/arm/v7
     image: vbstreetz/signatory-client:latest
-    command: yarn client
+    command: ./node_modules/.bin/serve ./build -s
     ports:
       - '${PORT}:5000'
 
   server:
     image: vbstreetz/signatory-client:latest
-    command: yarn server
+    command: ./node_modules/.bin/signatory -d ./data
     ports:
       - 1999:1999

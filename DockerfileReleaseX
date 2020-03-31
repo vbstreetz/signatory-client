@@ -1,0 +1,25 @@
+FROM node:10.18.0
+
+WORKDIR /tmp
+
+ADD package.json package.json
+ADD yarn.lock yarn.lock
+#RUN yarn install --unsafe-perm --network-timeout 100000 --verbose
+
+ARG NODE_PATH
+ARG REACT_APP_INFURA_API_KEY
+ADD src src
+ADD public public
+ADD jsconfig.json jsconfig.json
+#RUN REACT_APP_INFURA_API_KEY=$REACT_APP_INFURA_API_KEY npm run build
+ADD build build
+
+FROM node:10.18.0
+
+WORKDIR /tmp
+RUN npm install serve @etclabscore/signatory
+#COPY --from=0 /tmp/build .
+
+FROM node:alpine as app
+COPY --from=1 node_modules .
+ADD build build

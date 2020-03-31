@@ -5,7 +5,7 @@ services:
     build:
       context: ./
       dockerfile: DockerfileDev
-    image: vbstreetz/signatory-client-dev:latest
+    image: vbstreetz/signatory-client:dev
     command: yarn start
     environment:
       REACT_APP_IS_DEV: 1
@@ -17,7 +17,7 @@ services:
       - '${PORT}:4444'
 
   server:
-    image: vbstreetz/signatory-client-dev:latest
+    image: vbstreetz/signatory-client:dev
     command: yarn server
     ports:
       - 1999:1999

@@ -3,12 +3,12 @@ version: '2.4'
 services:
   client:
     image: vbstreetz/signatory-client:latest
-    command: yarn client
+    command: ./node_modules/.bin/serve ./build -s
     ports:
       - '${PORT}:5000'
 
   server:
     image: vbstreetz/signatory-client:latest
-    command: yarn server
+    command: ./node_modules/.bin/signatory -d ./data
     ports:
       - 1999:1999

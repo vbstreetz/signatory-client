@@ -1,6 +1,6 @@
 .git
 .github
-build
+#build
 landing
 node_modules
 test
