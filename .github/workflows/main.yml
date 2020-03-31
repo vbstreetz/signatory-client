@@ -15,18 +15,29 @@ jobs:
       # node
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.18'
+          node-version: '10.18.0'
       - run: yarn install
       - run: yarn build
+      # cache
+      - uses: actions/cache@v1
+        with:
+          path: /cache/docker
+          key: ${{ runner.os }}-docker-buildx-${{ hashFiles('**/Dockerfile') }}
+          restore-keys: ${{ runner.os }}-docker-buildx-
       # docker
       - name: Set Up Docker Buildx
         id: buildx
         uses: crazy-max/ghaction-docker-buildx@v1
         with:
           version: latest
-      - name: Available Platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
       - name: Docker Login
         run: docker login -u vbstreetz -p ${{ secrets.dockerhub }}
       - name: Run Buildx
-        run: ./buildx.sh
+        run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm/v7,linux/arm64 \
+            --tag vbstreetz/signatory-client:latest \
+            --file ./DockerfileRelease \
+            --cache-to=type=local,dest=/cache/docker \
+            --push \
+            ./
