@@ -6,8 +6,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { TextField, Button, Paper } from '@material-ui/core';
 import { stringToHex, numberToHex } from '@etclabscore/eserialize';
 
+import sl from 'utils/sl';
 import * as mapDispatchToProps from 'actions';
-import { IS_DEV } from 'config';
+import { IS_DEV, CHAINS_MAP, NETWORKS_MAP } from 'config';
 import { web3Selector } from 'selectors/wallet';
 
 const useStyles = makeStyles(theme => ({
@@ -31,9 +32,10 @@ const SAMPLE = {
   gasLimit: '23000',
 };
 
-const Component = ({ account, passphrase, rpc, web3 }) => {
+const Component = ({ from, to, passphrase, rpc, web3, network }) => {
   const classes = useStyles();
   const [result, setResult] = React.useState(null);
+  const { tokenSymbol } = CHAINS_MAP[NETWORKS_MAP[network].chain];
 
   const onSignTrasaction = async e => {
     e.preventDefault();
@@ -48,8 +50,6 @@ const Component = ({ account, passphrase, rpc, web3 }) => {
     );
 
     try {
-      const networkId = await web3.eth.net.getId();
-      console.log('network(%s)', networkId);
       payload.nonce = await web3.eth.getTransactionCount(payload.from);
       const data = stringToHex(payload.data);
       const sig = await rpc(
@@ -66,7 +66,7 @@ const Component = ({ account, passphrase, rpc, web3 }) => {
           data: data === '0x' ? '0x00' : data,
         },
         passphrase,
-        numberToHex(networkId)
+        numberToHex(await web3.eth.getChainId())
       );
 
       setResult(sig);
@@ -80,10 +80,14 @@ const Component = ({ account, passphrase, rpc, web3 }) => {
     NProgress.start();
     NProgress.set(0.4);
 
-    const { transactionHash } = await web3.eth.sendSignedTransaction(result);
-
-    NProgress.done();
-    setResult(transactionHash);
+    try {
+      const { transactionHash } = await web3.eth.sendSignedTransaction(result);
+      setResult(transactionHash);
+    } catch (e) {
+      sl('error', e.message);
+    } finally {
+      NProgress.done();
+    }
   };
 
   return (
@@ -97,7 +101,7 @@ const Component = ({ account, passphrase, rpc, web3 }) => {
             shrink: true,
           }}
           placeholder={'0x1234...'}
-          defaultValue={account}
+          defaultValue={from || ''}
           fullWidth
           required
         />
@@ -112,6 +116,7 @@ const Component = ({ account, passphrase, rpc, web3 }) => {
             shrink: true,
           }}
           placeholder={'0x5678...'}
+          defaultValue={to || ''}
           fullWidth
           required
         />
@@ -120,7 +125,7 @@ const Component = ({ account, passphrase, rpc, web3 }) => {
       <div className={classes.row}>
         <TextField
           id="value"
-          label="Value / Amount to Send (ETH)"
+          label={`Value / Amount to Send (${tokenSymbol})`}
           type="text"
           InputLabelProps={{
             shrink: true,
@@ -218,7 +223,13 @@ const Component = ({ account, passphrase, rpc, web3 }) => {
 
 export default connect((state, { match }) => {
   const {
-    wallet: { account, passphrase, chainId, networkId },
+    wallet: { account, accounts, passphrase, network },
   } = state;
-  return { account, passphrase, chainId, networkId, web3: web3Selector(state) };
+  return {
+    from: account,
+    to: accounts[1],
+    passphrase,
+    network,
+    web3: web3Selector(state),
+  };
 }, mapDispatchToProps)(Component);

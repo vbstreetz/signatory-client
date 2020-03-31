@@ -9,7 +9,7 @@ import {
   FormControl,
   InputLabel,
 } from '@material-ui/core';
-import { CHAINS } from 'config';
+import { CHAINS_LIST, NETWORKS_LIST } from 'config';
 import * as mapDispatchToProps from 'actions';
 import { makeStyles } from '@material-ui/core/styles';
 import qs from 'query-string';
@@ -34,19 +34,14 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function Component({
-  match,
-  updateWallet,
-  signatoryServerUrl,
-  chainId,
-  networkId,
-  history,
-}) {
+function Component({ match, updateWallet, wallet, history }) {
   const classes = useStyles();
   const query = qs.parse(window.location.search.replace('?', ''));
   const backTo = query['back-to'] || '/';
-  const [formData, setFormData] = React.useState({ chainId, networkId });
-
+  const [formData, setFormData] = React.useState({
+    ...wallet,
+    chain: wallet.network.split('-')[0],
+  });
   const handleFormDataChange = data => {
     setFormData({
       ...formData,
@@ -56,12 +51,12 @@ function Component({
 
   const onSubmit = async e => {
     e.preventDefault();
-    const signatoryServerUrl = (e.target.signatoryServerUrl.value ?? '').trim();
-    const { chainId, networkId } = formData;
-    cache('signatoryServerUrl', signatoryServerUrl);
-    cache('chainId', chainId);
-    cache('networkId', networkId);
-    updateWallet({ chainId, networkId, signatoryServerUrl });
+    const { signatoryServerUrl, network, infuraApiKey } = formData;
+    cache('signatoryServerUrl', formData.signatoryServerUrl);
+    cache('chain', formData.chain);
+    cache('network', formData.network);
+    cache('infuraApiKey', formData.infuraApiKey);
+    updateWallet({ network, signatoryServerUrl, infuraApiKey });
     history.push(backTo);
   };
 
@@ -86,7 +81,10 @@ function Component({
                 shrink: true,
               }}
               placeholder={'http://localhost:1999'}
-              defaultValue={signatoryServerUrl}
+              value={formData.signatoryServerUrl || ''}
+              onChange={e =>
+                handleFormDataChange({ signatoryServerUrl: e.target.value })
+              }
               fullWidth
               required
             />
@@ -97,22 +95,23 @@ function Component({
               Chain*
             </InputLabel>
             <NativeSelect
-              value={formData.chainId}
-              onChange={e =>
+              value={formData.chain}
+              onChange={e => {
+                const chain = e.target.value;
                 handleFormDataChange({
-                  chainId: parseInt(e.target.value),
-                  networkId: 1,
-                })
-              }
+                  chain,
+                  network: `${chain}-mainnet`,
+                });
+              }}
               inputProps={{
-                name: 'chainId',
-                id: 'chainId',
+                name: 'chain',
+                id: 'chain',
               }}
               fullWidth
             >
-              {Object.entries(CHAINS).map(([id, { name }]) => (
-                <option key={id} value={id}>
-                  {name}
+              {CHAINS_LIST.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </NativeSelect>
@@ -123,25 +122,39 @@ function Component({
               Network*
             </InputLabel>
             <NativeSelect
-              value={formData.networkId}
-              onChange={e =>
-                handleFormDataChange({ networkId: parseInt(e.target.value) })
-              }
+              value={formData.network}
+              onChange={e => handleFormDataChange({ network: e.target.value })}
               inputProps={{
-                name: 'networkId',
-                id: 'networkId',
+                name: 'network',
+                id: 'network',
               }}
               fullWidth
             >
-              {Object.entries(CHAINS[formData.chainId].networks).map(
-                ([id, { name }]) => (
-                  <option key={id} value={id}>
-                    {string.toTitleCase(name)}
-                  </option>
-                )
-              )}
+              {NETWORKS_LIST.filter(n => n.chain === formData.chain).map(n => (
+                <option key={n.name} value={n.id}>
+                  {string.toTitleCase(n.name)}
+                </option>
+              ))}
             </NativeSelect>
           </FormControl>
+
+          <div className={classes.row}>
+            <TextField
+              id="infuraApiKey"
+              label="Infura Api Key"
+              type="text"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              value={formData.infuraApiKey || ''}
+              placeholder="Used to broadcast ETH transactions..."
+              onChange={e =>
+                handleFormDataChange({ infuraApiKey: e.target.value })
+              }
+              fullWidth
+              required
+            />
+          </div>
 
           <div className={clsx('flex flex--align-center')}>
             <Button
@@ -169,6 +182,6 @@ function Component({
 }
 
 export default connect(
-  ({ wallet }) => ({ ...wallet }),
+  ({ wallet }) => ({ wallet }),
   mapDispatchToProps
 )(Component);

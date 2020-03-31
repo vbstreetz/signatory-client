@@ -6,15 +6,3 @@ export function updateData(payload) {
     payload,
   };
 }
-
-export function loadStuff() {
-  return async(dispatch, getState) => {
-    try {
-      await dispatch(
-        console.log('x')
-      );
-    } catch (e) {
-      console.warn(e);
-    }
-  };
-}

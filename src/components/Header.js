@@ -23,7 +23,12 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import CopyIcon from '@material-ui/icons/FileCopy';
 import { isDarkSelector } from 'selectors/theme';
 import { web3Selector } from 'selectors/wallet';
-import { LOGIC_TYPES_MNEMONIC, CHAINS } from 'config';
+import {
+  LOGIC_TYPES_MNEMONIC,
+  CHAINS_MAP,
+  NETWORKS_MAP,
+  NETWORKS_LIST,
+} from 'config';
 
 function Component({
   toggleTheme,
@@ -34,15 +39,18 @@ function Component({
   chooseAccount,
   logout,
   isMnemonicType,
-  chainId,
-  networkId,
+  network,
   web3,
+  updateWallet,
 }) {
   const [accountMenuAnchorEl, setAaccountMenuAnchorEl] = React.useState(null);
+  const [networkMenuAnchorEl, setNerworkMenuAnchorEl] = React.useState(null);
   const [balance, setBalance] = React.useState('0');
 
-  const { name: chain, networks, tokenSymbol } = CHAINS[chainId];
-  const { name: network } = networks[networkId];
+  const { name: networkName, chain, tokenSymbol } = NETWORKS_MAP[network];
+  const { name: chainName } = CHAINS_MAP[chain];
+
+  //
 
   const handleOpenAccounts = event => {
     setAaccountMenuAnchorEl(event.currentTarget);
@@ -62,19 +70,37 @@ function Component({
     handleCloseAccounts();
   };
 
+  //
+
+  const handleOpenNetworks = event => {
+    setNerworkMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseNetworks = () => {
+    setNerworkMenuAnchorEl(null);
+  };
+
+  const handleChooseNetwork = async network => {
+    updateWallet({ network });
+    handleCloseNetworks();
+  };
+
+  //
+
   const handleLogout = () => {
     handleCloseAccounts();
     logout();
   };
 
-  const onMount = async() => {
-    if (account) {
-      setBalance(await web3.eth.getBalance(account));
-    }
-  };
-
   const copyAddress = () => {
     navigator.clipboard.writeText(account);
+  };
+
+  const onMount = async() => {
+    if (account) {
+      console.log('chain(%s)', await web3.eth.getChainId());
+      setBalance(await web3.eth.getBalance(account));
+    }
   };
 
   React.useEffect(() => {
@@ -102,9 +128,39 @@ function Component({
         &nbsp;
         {!account ? null : (
           <React.Fragment>
-            <Button aria-controls="chain-network" aria-haspopup="true">
-              Network: {chain}({network})
+            <Button
+              aria-controls="chain-network"
+              aria-haspopup="true"
+              onClick={handleOpenNetworks}
+            >
+              Network: {chainName}({networkName})
             </Button>
+
+            <Menu
+              id="networks"
+              anchorEl={networkMenuAnchorEl}
+              keepMounted
+              open={Boolean(networkMenuAnchorEl)}
+              onClose={handleCloseNetworks}
+            >
+              <MenuItem>ETHEREUM CLASSIC</MenuItem>
+              <Divider />
+              {NETWORKS_LIST.filter(n => n.chain === 'etc').map(n => (
+                <MenuItem onClick={() => handleChooseNetwork(n.id)} key={n.id}>
+                  {n.name}
+                </MenuItem>
+              ))}
+
+              <Divider />
+              <MenuItem>ETHEREUM</MenuItem>
+              <Divider />
+
+              {NETWORKS_LIST.filter(n => n.chain === 'eth').map(n => (
+                <MenuItem onClick={() => handleChooseNetwork(n.id)} key={n.id}>
+                  {n.name}
+                </MenuItem>
+              ))}
+            </Menu>
 
             <Button
               aria-controls="accounts"
@@ -187,15 +243,14 @@ function Component({
 
 const mapStateToProps = state => {
   const {
-    wallet: { account, accounts, type: loginType, chainId, networkId },
+    wallet: { account, accounts, type: loginType, network },
   } = state;
   return {
     isDark: isDarkSelector(state),
     account,
     accounts,
     isMnemonicType: loginType !== LOGIC_TYPES_MNEMONIC,
-    chainId,
-    networkId,
+    network,
     web3: web3Selector(state),
   };
 };

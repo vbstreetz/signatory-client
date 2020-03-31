@@ -5,8 +5,6 @@ services:
     build:
       context: ./
       dockerfile: DockerfileRelease
-      args:
-        REACT_APP_INFURA_API_KEY: '${INFURA_API_KEY}'
     platform: linux/arm/v7
     image: vbstreetz/signatory-client:latest
     command: ./node_modules/.bin/serve ./build -s

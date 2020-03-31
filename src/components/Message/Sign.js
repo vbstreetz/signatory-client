@@ -4,6 +4,7 @@ import * as mapDispatchToProps from 'actions';
 import { makeStyles } from '@material-ui/core/styles';
 import { TextField, Button, Paper } from '@material-ui/core';
 import { stringToHex, numberToHex } from '@etclabscore/eserialize';
+import { web3Selector } from 'selectors/wallet';
 
 const useStyles = makeStyles(theme => ({
   result: {
@@ -14,7 +15,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Component = ({ account, passphrase, rpc, chainId }) => {
+const Component = ({ account, passphrase, rpc, web3 }) => {
   const classes = useStyles();
   const [result, setResult] = React.useState(null);
 
@@ -29,7 +30,7 @@ const Component = ({ account, passphrase, rpc, chainId }) => {
       stringToHex(msg),
       account,
       passphrase,
-      numberToHex(chainId)
+      numberToHex(await web3.eth.getChainId())
     );
 
     setResult(sig);
@@ -68,9 +69,9 @@ const Component = ({ account, passphrase, rpc, chainId }) => {
   );
 };
 
-export default connect(
-  ({ wallet: { account, passphrase, chainId } }, { match }) => {
-    return { account, passphrase, chainId };
-  },
-  mapDispatchToProps
-)(Component);
+export default connect((state, { match }) => {
+  const {
+    wallet: { account, passphrase },
+  } = state;
+  return { account, passphrase, web3: web3Selector(state) };
+}, mapDispatchToProps)(Component);

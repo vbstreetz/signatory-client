@@ -1,14 +1,15 @@
 import { createSelector } from 'reselect';
 import Web3 from 'web3';
-import { CHAINS } from 'config';
+import { NETWORKS_MAP } from 'config';
 
 export const web3Selector = createSelector(
-  state => state.wallet.chainId,
-  state => state.wallet.networkId,
-  (chainId, networkId) => {
+  state => state.wallet.network,
+  state => state.wallet.infuraApiKey,
+  (network, infuraApiKey) => {
+    const { providerUrl, chain } = NETWORKS_MAP[network];
     return new Web3(
       new Web3.providers.HttpProvider(
-        CHAINS[chainId].networks[networkId].providerUrl
+        providerUrl + (chain === 'eth' ? infuraApiKey : '')
       )
     );
   }

@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Component = ({ web3, networkId }) => {
+const Component = ({ web3 }) => {
   const classes = useStyles();
   const [result, setResult] = React.useState(null);
 
@@ -71,8 +71,5 @@ const Component = ({ web3, networkId }) => {
 };
 
 export default connect((state, { match }) => {
-  const {
-    wallet: { networkId },
-  } = state;
-  return { networkId, web3: web3Selector(state) };
+  return { web3: web3Selector(state) };
 }, mapDispatchToProps)(Component);

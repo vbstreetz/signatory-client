@@ -6,6 +6,7 @@ import { TextField, Button } from '@material-ui/core';
 import * as ethUtil from 'ethereumjs-util';
 import { stringToHex } from '@etclabscore/eserialize';
 import sl from 'utils/sl';
+import { web3Selector } from 'selectors/wallet';
 
 const useStyles = makeStyles(theme => ({
   result: {
@@ -16,7 +17,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export const recoverPublicKeyFromSig = (msg, sig, chainId) => {
+export const recoverPublicKeyFromSig = (msg, sig, cId) => {
   const sigParams = ethUtil.fromRpcSig(sig);
   const msgHash = ethUtil.hashPersonalMessage(Buffer.from(stringToHex(msg)));
   const pubKey = ethUtil.ecrecover(
@@ -24,12 +25,12 @@ export const recoverPublicKeyFromSig = (msg, sig, chainId) => {
     sigParams.v,
     sigParams.r,
     sigParams.s,
-    chainId
+    cId
   );
   return '0x' + ethUtil.publicToAddress(pubKey).toString('hex');
 };
 
-const Component = ({ account, passphrase, chainId }) => {
+const Component = ({ account, passphrase, web3 }) => {
   const classes = useStyles();
 
   const onSubmit = async e => {
@@ -45,7 +46,7 @@ const Component = ({ account, passphrase, chainId }) => {
       const verifiedAddress = recoverPublicKeyFromSig(
         payload.message,
         payload.signature,
-        chainId
+        await web3.eth.getChainId()
       );
       sl(
         verifiedAddress.toLowerCase() === payload.address.toLowerCase()
@@ -110,9 +111,9 @@ const Component = ({ account, passphrase, chainId }) => {
   );
 };
 
-export default connect(
-  ({ wallet: { account, passphrase, chainId } }, { match }) => {
-    return { account, passphrase, chainId };
-  },
-  mapDispatchToProps
-)(Component);
+export default connect((state, { match }) => {
+  const {
+    wallet: { account, passphrase },
+  } = state;
+  return { account, passphrase, web3: web3Selector(state) };
+}, mapDispatchToProps)(Component);

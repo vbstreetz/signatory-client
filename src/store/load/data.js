@@ -1,9 +1,5 @@
 import cache from 'utils/cache';
-import {
-  DEFAULT_SIGNATORY_SERVER_URL,
-  DEFAULT_CHAIN_ID,
-  DEFAULT_NETWORK_ID,
-} from 'config';
+import { DEFAULT_SIGNATORY_SERVER_URL, DEFAULT_NETWORK } from 'config';
 
 export default Base =>
   class extends Base {
@@ -22,8 +18,8 @@ export default Base =>
         this.state.wallet.accounts = accounts;
         this.state.wallet.signatoryServerUrl =
           cache('signatoryServerUrl') || DEFAULT_SIGNATORY_SERVER_URL;
-        this.state.wallet.chainId = cache('chainId') || DEFAULT_CHAIN_ID;
-        this.state.wallet.networkId = cache('networkId') || DEFAULT_NETWORK_ID;
+        this.state.wallet.network = cache('network') || DEFAULT_NETWORK;
+        this.state.wallet.infuraApiKey = cache('infuraApiKey');
       } catch (error) {
         console.log(error);
       }

@@ -46,8 +46,6 @@ const Component = ({ path, match }) => {
   let activeTab = ROUTES.indexOf(path);
   activeTab = -1 === activeTab ? 0 : activeTab;
 
-  // console.log(activeTab, path);
-
   const handleActiveTabChange = (event, newValue) => {
     history.push(`/message${newValue ? ROUTES[newValue] : ''}`);
   };

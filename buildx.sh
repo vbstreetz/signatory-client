@@ -4,8 +4,7 @@ source .env
 
 docker buildx build \
   --platform ${PLATFORMS} \
-  --build-arg REACT_APP_INFURA_API_KEY=${INFURA_API_KEY} \
-  -t vbstreetz/signatory-client:latest \
-  -f DockerfileRelease \
+  --tag vbstreetz/signatory-client:latest \
+  --file ./DockerfileRelease \
   --push \
-  .
+  ./

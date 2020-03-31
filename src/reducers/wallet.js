@@ -2,8 +2,7 @@ import { ACTION_TYPE_UPDATE_WALLET } from 'config';
 
 const DEFAULT_STATE = {
   signatoryServerUrl: null,
-  chainId: null,
-  networkId: null,
+  network: null,
   type: null,
   wallet: null,
   account: null,
