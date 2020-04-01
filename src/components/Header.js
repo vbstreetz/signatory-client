@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as mapDispatchToProps from 'actions';
 import { Link } from 'react-router-dom';
+import copyToClipboard from 'clipboard-copy';
 import {
   IconButton,
   Tooltip,
@@ -93,7 +94,7 @@ function Component({
   };
 
   const copyAddress = () => {
-    navigator.clipboard.writeText(account);
+    copyToClipboard(account);
   };
 
   const onMount = async() => {
