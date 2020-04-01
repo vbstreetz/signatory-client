@@ -12,6 +12,8 @@ An Ethereum Wallet GUI powered by [Signatory Server](https://signatory.dev), tha
 - [x] Allows generation of mnemonic phrases and keystore files
 - [x] Provides ability to sign and verify messages
 - [x] Provides ability to sign and broadcast transactions
+- [ ] Interact with smart contracts
+- [ ] Send ERC20 tokens
 
 It is greatly inspired by [MyCrypto Wallet](https://github.com/MyCryptoHQ/MyCrypto), an electronjs client for generating ether wallets, handling ERC-20 tokens, and interacting with the blockchain more easily.
 
@@ -26,6 +28,10 @@ It is greatly inspired by [MyCrypto Wallet](https://github.com/MyCryptoHQ/MyCryp
    \$ make run
 
 4. Visit app at http://localhost:4444
+
+## Video Demo
+
+https://youtu.be/G_I-pEhTmmo
 
 ## Contributing
 

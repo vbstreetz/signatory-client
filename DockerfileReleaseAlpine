@@ -1,0 +1,5 @@
+FROM node:10.18.0-alpine
+RUN apk add --no-cache --virtual .gyp python make g++ libc6-compat \
+  && npm install --prefer-offline serve @etclabscore/signatory \
+  && apk del .gyp
+ADD build build

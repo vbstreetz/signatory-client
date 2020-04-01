@@ -152,7 +152,6 @@ function Component({ match, updateWallet, wallet, history }) {
                 handleFormDataChange({ infuraApiKey: e.target.value })
               }
               fullWidth
-              required
             />
           </div>
 

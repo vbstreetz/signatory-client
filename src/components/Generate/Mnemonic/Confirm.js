@@ -112,7 +112,7 @@ function Component({
             return (
               <div className={classes.gridItem} key={word}>
                 <Badge
-                  badgeContent={index}
+                  badgeContent={index + 1}
                   color="primary"
                   invisible={!isValid}
                 >
