@@ -38,7 +38,7 @@ jobs:
         with:
           version: latest
       - name: Docker Login
-        run: docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PASSWORD }}
+        run: docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" -p "${{ secrets.DOCKER_HUB_PASSWORD }}"
       - name: Run Buildx
         run: |
           docker buildx build \
